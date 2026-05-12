@@ -1,0 +1,47 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# --- Virtual environments ---
+venv/
+.venv/
+env/
+ENV/
+
+# --- Distribution / packaging ---
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# --- Secrets ---
+# Real env file (with API keys) never committed. Template `.env.example` IS committed.
+.env
+
+# --- IDE / editor ---
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# --- OS junk ---
+.DS_Store
+Thumbs.db
+
+# --- Project-specific: derived artifacts (rebuild from source via ingest.py) ---
+chroma_db/
+
+# --- Source documents: keep the folder, ignore the large binaries ---
+data/*.pdf
+data/*.txt
+data/*.md
+!data/.gitkeep
+
+# --- Logs ---
+*.log
+
+# --- Claude Code local config (per-user, not project) ---
+.claude/
