@@ -5,7 +5,7 @@ A two-layer customer support assistant for the Indian health insurance domain.
 **Layer 2** wraps it with a Dialogflow CX agent that handles structured tasks deterministically
 and falls back to the RAG service for open-ended questions.
 
-> **Status:** Layer 1 (RAG chatbot) complete and demoable. Layer 2 (Dialogflow CX) in progress.
+> **Status:** Layer 1 (RAG chatbot) ✅ complete. Layer 2 (Dialogflow CX + webhook) ✅ complete.
 
 ## Problem statement
 
@@ -33,7 +33,7 @@ and an **online query path** (query → embed → retrieve top-K → grounded pr
 | --- | --- | --- |
 | Language | Python 3.11+ | Standard for ML/AI tooling |
 | LLM | Gemini 2.5 Flash via `google-genai` | Cheap, fast, in the Google ecosystem |
-| Embeddings | `text-embedding-004` | Matches the Google stack; strong quality |
+| Embeddings | `gemini-embedding-001` | Current stable Google embedding model; 3072-dim vectors |
 | Vector store | Chroma (local, persistent) | Zero-setup, fine for < 100K chunks |
 | PDF parsing | `pypdf` | Pure Python, no system deps |
 | API | FastAPI + Uvicorn | Async, OpenAPI for free |
@@ -88,6 +88,37 @@ _Each entry below has a longer explanation in `docs/architecture.md`._
 - **Deterministic chunk IDs (`source-pX-cY`)** — re-running `ingest.py` upserts rather than duplicates. Idempotent re-ingestion.
 - **In-memory session store (last 3 turns, per `session_id`)** — simplest thing that works for a demo. Redis is the prod upgrade.
 - **No reranker, no query rewriting, no eval harness in Layer 1** — listed as Layer 3 improvements.
+
+## Layer 2 — Dialogflow CX setup
+
+The CX agent lives in Google's cloud console. To run Layer 2 locally you need:
+
+```bash
+# Terminal 1 — RAG service
+uvicorn src.api:app --port 8000
+
+# Terminal 2 — Webhook server
+uvicorn dialogflow_cx.webhook.main:app --port 8001
+
+# Terminal 3 — Expose webhook publicly
+ngrok http 8001
+# Copy the https://xxxx.ngrok-free.app URL
+```
+
+Then in the Dialogflow CX console:
+- Set webhook URL to `https://xxxx.ngrok-free.app/webhook` (timeout: 30s)
+- Three routes on Start page:
+  - Intent `check-claim-status` → webhook tag `check-claim-status`
+  - Intent `find-hospital` → webhook tag `find-hospital`
+  - Event `sys.no-match-default` → webhook tag `faq-fallback`
+
+Test in the CX simulator with:
+1. `what is the status of claim 8823` → deterministic mock response
+2. `find network hospital in Mumbai` → mock hospital list
+3. `what is the waiting period for pre-existing diseases` → RAG answer with citation
+
+Mock claim IDs: `8823` (Under Review), `1234` (Approved), `5678` (Rejected), `9999` (Processing)
+Mock cities: Mumbai, Delhi, Pune, Bangalore, Hyderabad
 
 ## Known limitations
 
