@@ -57,7 +57,7 @@ CHUNK_OVERLAP: int = int(os.getenv("CHUNK_OVERLAP", "50"))
 # ---------- Retrieval ----------
 # Top-K=4 gives ~2K tokens of context, leaving room for system instructions
 # and the last few turns of conversation without blowing the context window.
-TOP_K: int = int(os.getenv("TOP_K", "4"))
+TOP_K: int = int(os.getenv("TOP_K", "3"))
 
 # If the best chunk's similarity is below this, we short-circuit to
 # "I don't know" without even calling the LLM. Cheap, fast, hallucination-safe.
