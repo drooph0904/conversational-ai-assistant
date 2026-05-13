@@ -64,6 +64,11 @@ TOP_K: int = int(os.getenv("TOP_K", "3"))
 SIMILARITY_THRESHOLD: float = float(os.getenv("SIMILARITY_THRESHOLD", "0.6"))
 
 
+# ---------- Webhook (Layer 2) ----------
+RAG_API_URL: str = os.getenv("RAG_API_URL", "http://localhost:8000/chat")
+WEBHOOK_PORT: int = int(os.getenv("WEBHOOK_PORT", "8001"))
+
+
 # ---------- Conversation memory ----------
 # Keep the last N user+assistant pairs in the prompt. Enough for follow-ups
 # ("what about for senior citizens?") without bloating cost or letting stale
