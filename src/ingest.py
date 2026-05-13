@@ -7,10 +7,12 @@ instead of duplicating. Chunks within a single page so citations stay clean.
 """
 
 import re
+import time
 from pathlib import Path
 
 import chromadb
 from google import genai
+from google.genai import errors as genai_errors
 from google.genai import types
 from pypdf import PdfReader
 
@@ -26,7 +28,12 @@ from src.config import (
 
 # Approximate token count via word count. ~0.75 words per token for English.
 WORDS_PER_TOKEN = 0.75
-EMBED_BATCH_SIZE = 100
+
+# Free-tier embedding limit is ~30K tokens/min; small batches with pacing
+# keep us comfortably under that. Bump these on a paid plan.
+EMBED_BATCH_SIZE = 5
+BATCH_SLEEP_SECONDS = 12.0
+RATE_LIMIT_RETRY_WAIT_SECONDS = 60.0
 
 
 def load_pages(data_dir: Path) -> list[dict]:
@@ -61,14 +68,25 @@ def chunk_text(text: str, size_tokens: int, overlap_tokens: int) -> list[str]:
     return chunks
 
 
-def embed_batch(client: genai.Client, texts: list[str]) -> list[list[float]]:
-    """Embed up to EMBED_BATCH_SIZE strings as RETRIEVAL_DOCUMENT vectors."""
+def _embed_once(client: genai.Client, texts: list[str]) -> list[list[float]]:
     result = client.models.embed_content(
         model=EMBEDDING_MODEL,
         contents=texts,
         config=types.EmbedContentConfig(task_type="RETRIEVAL_DOCUMENT"),
     )
     return [e.values for e in result.embeddings]
+
+
+def embed_batch(client: genai.Client, texts: list[str]) -> list[list[float]]:
+    """Embed a batch as RETRIEVAL_DOCUMENT vectors; retry once after a 429."""
+    try:
+        return _embed_once(client, texts)
+    except genai_errors.ClientError as e:
+        if "429" not in str(e):
+            raise
+        print(f"  rate-limited; sleeping {RATE_LIMIT_RETRY_WAIT_SECONDS:.0f}s and retrying once ...")
+        time.sleep(RATE_LIMIT_RETRY_WAIT_SECONDS)
+        return _embed_once(client, texts)
 
 
 def main() -> None:
@@ -92,13 +110,17 @@ def main() -> None:
             })
     print(f"  {len(records)} chunks.")
 
-    print(f"Embedding with {EMBEDDING_MODEL} (batch={EMBED_BATCH_SIZE}) ...")
+    print(f"Embedding with {EMBEDDING_MODEL} (batch={EMBED_BATCH_SIZE}, pace={BATCH_SLEEP_SECONDS}s) ...")
     client = genai.Client(api_key=GOOGLE_API_KEY)
     vectors: list[list[float]] = []
-    for i in range(0, len(records), EMBED_BATCH_SIZE):
+    total = len(records)
+    for i in range(0, total, EMBED_BATCH_SIZE):
         batch_texts = [r["text"] for r in records[i : i + EMBED_BATCH_SIZE]]
         vectors.extend(embed_batch(client, batch_texts))
-        print(f"  {min(i + EMBED_BATCH_SIZE, len(records))}/{len(records)}")
+        done = min(i + EMBED_BATCH_SIZE, total)
+        print(f"  {done}/{total}")
+        if done < total:
+            time.sleep(BATCH_SLEEP_SECONDS)
 
     print(f"Upserting to Chroma at {CHROMA_PATH} (collection={CHROMA_COLLECTION}) ...")
     chroma = chromadb.PersistentClient(path=CHROMA_PATH)
