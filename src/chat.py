@@ -35,16 +35,23 @@ _history: dict[str, deque] = defaultdict(
 )
 
 
+_ESCALATION = (
+    "For further assistance, please speak with one of our support specialists "
+    "at 1800-XXX-XXXX (toll-free, Mon–Sat 9 AM–6 PM IST)."
+)
+
 SYSTEM_PROMPT = (
     "You are a customer support assistant for Indian health insurance. "
     "Answer the user's question using ONLY the context passages provided. "
     "If the context does not contain the answer, reply exactly with: "
-    "\"I don't have information about that in my knowledge base.\" "
+    f"\"I don't have information about that in my knowledge base. {_ESCALATION}\" "
     "Do not use outside knowledge. Be concise. "
     "Cite the sources you used inline as [source filename, page N]."
 )
 
-FALLBACK_ANSWER = "I don't have information about that in my knowledge base."
+FALLBACK_ANSWER = (
+    f"I don't have information about that in my knowledge base. {_ESCALATION}"
+)
 
 
 @dataclass
