@@ -33,7 +33,7 @@ GOOGLE_API_KEY: str = os.environ["GOOGLE_API_KEY"]
 # Both sides of the pipeline (ingest and retrieve) must use the SAME embedding
 # model - otherwise the query vectors and document vectors live in different
 # spaces and similarity search returns garbage.
-EMBEDDING_MODEL: str = os.getenv("EMBEDDING_MODEL", "gemini-embedding-001")
+EMBEDDING_MODEL: str = os.getenv("EMBEDDING_MODEL", "gemini-embedding-2")
 CHAT_MODEL: str = os.getenv("CHAT_MODEL", "gemini-2.5-flash")
 
 

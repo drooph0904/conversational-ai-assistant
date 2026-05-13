@@ -70,12 +70,17 @@ def chunk_text(text: str, size_tokens: int, overlap_tokens: int) -> list[str]:
 
 
 def _embed_once(client: genai.Client, texts: list[str]) -> list[list[float]]:
-    result = client.models.embed_content(
-        model=EMBEDDING_MODEL,
-        contents=texts,
-        config=types.EmbedContentConfig(task_type="RETRIEVAL_DOCUMENT"),
-    )
-    return [e.values for e in result.embeddings]
+    # gemini-embedding-2 accepts one text per call (unlike gemini-embedding-001
+    # which accepted a batch). Loop and collect individually.
+    embeddings = []
+    for text in texts:
+        result = client.models.embed_content(
+            model=EMBEDDING_MODEL,
+            contents=text,
+            config=types.EmbedContentConfig(task_type="RETRIEVAL_DOCUMENT"),
+        )
+        embeddings.append(result.embeddings[0].values)
+    return embeddings
 
 
 def embed_batch(client: genai.Client, texts: list[str]) -> list[list[float]]:
