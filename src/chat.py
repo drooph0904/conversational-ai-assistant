@@ -19,8 +19,10 @@ from src.config import (
     CHAT_MODEL,
     GOOGLE_API_KEY,
     MAX_HISTORY_TURNS,
+    RETRIEVE_K,
     SIMILARITY_THRESHOLD,
 )
+from src.rerank import rerank
 from src.retrieve import Chunk, retrieve
 
 
@@ -72,7 +74,22 @@ def _format_context(chunks: list[Chunk]) -> str:
 
 
 def generate_answer(query: str, session_id: str) -> ChatResult:
-    chunks = retrieve(query)
+    # Stage 1: bi-encoder retrieval — wide net for recall.
+    candidates = retrieve(query, k=RETRIEVE_K)
+
+    # Guardrail: if the best bi-encoder score is below threshold, nothing
+    # relevant exists. Skip reranker and LLM — saves cost and latency.
+    if not candidates or candidates[0].score < SIMILARITY_THRESHOLD:
+        _history[session_id].append(("user", query))
+        _history[session_id].append(("model", FALLBACK_ANSWER))
+        return ChatResult(
+            answer=FALLBACK_ANSWER,
+            citations=[],
+            retrieved_chunks=[],
+        )
+
+    # Stage 2: cross-encoder reranker — precision over the candidate set.
+    chunks = rerank(query, candidates)
 
     retrieved_payload = [
         {
@@ -83,16 +100,6 @@ def generate_answer(query: str, session_id: str) -> ChatResult:
         }
         for c in chunks
     ]
-
-    # Guardrail 2: short-circuit on weak retrieval.
-    if not chunks or chunks[0].score < SIMILARITY_THRESHOLD:
-        _history[session_id].append(("user", query))
-        _history[session_id].append(("model", FALLBACK_ANSWER))
-        return ChatResult(
-            answer=FALLBACK_ANSWER,
-            citations=[],
-            retrieved_chunks=retrieved_payload,
-        )
 
     history_block = _format_history(_history[session_id])
     context_block = _format_context(chunks)

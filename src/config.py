@@ -55,13 +55,22 @@ CHUNK_OVERLAP: int = int(os.getenv("CHUNK_OVERLAP", "50"))
 
 
 # ---------- Retrieval ----------
-# Top-K=4 gives ~2K tokens of context, leaving room for system instructions
-# and the last few turns of conversation without blowing the context window.
+# Two-stage retrieval: bi-encoder fetches RETRIEVE_K candidates from Chroma,
+# then the cross-encoder reranker cuts them down to TOP_K for the LLM prompt.
+# Wider first-stage net (10) catches relevant chunks that dense similarity
+# would rank lower; reranker reorders them more accurately.
+RETRIEVE_K: int = int(os.getenv("RETRIEVE_K", "10"))
 TOP_K: int = int(os.getenv("TOP_K", "3"))
 
-# If the best chunk's similarity is below this, we short-circuit to
-# "I don't know" without even calling the LLM. Cheap, fast, hallucination-safe.
+# If the best bi-encoder chunk scores below this, skip both reranker and LLM.
+# Cheap short-circuit: if nothing is close in embedding space, reranking won't
+# save it either.
 SIMILARITY_THRESHOLD: float = float(os.getenv("SIMILARITY_THRESHOLD", "0.6"))
+
+# ---------- Reranking ----------
+# cross-encoder/ms-marco-MiniLM-L-6-v2: fine-tuned on 8.8M (query, passage)
+# pairs from MS MARCO. ~80 MB, runs in ~200 ms on CPU for 10 chunks.
+RERANK_MODEL: str = os.getenv("RERANK_MODEL", "cross-encoder/ms-marco-MiniLM-L-6-v2")
 
 
 # ---------- Webhook (Layer 2) ----------
