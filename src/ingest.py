@@ -8,6 +8,7 @@ instead of duplicating. Chunks within a single page so citations stay clean.
 
 import re
 import time
+from io import BytesIO
 from pathlib import Path
 
 import chromadb
@@ -135,6 +136,59 @@ def main() -> None:
         metadatas=[r["metadata"] for r in records],
     )
     print(f"Done. Collection size: {collection.count()} chunks.")
+
+
+def ingest_pdf_bytes(pdf_bytes: bytes, filename: str) -> int:
+    """Ingest a single PDF from raw bytes into the Chroma collection.
+
+    Returns the number of chunks upserted. Safe to call at runtime from the UI —
+    chunks are persisted to disk immediately and visible to retrieve.py on the
+    next query. On HF Spaces the disk resets on container restart, so uploaded
+    PDFs are session-scoped.
+    """
+    reader = PdfReader(BytesIO(pdf_bytes))
+    pages: list[dict] = []
+    for page_num, page in enumerate(reader.pages, start=1):
+        text = (page.extract_text() or "").strip()
+        if not text:
+            continue
+        pages.append({"source": filename, "page": page_num, "text": text})
+
+    if not pages:
+        return 0
+
+    records: list[dict] = []
+    for page in pages:
+        for c_idx, chunk in enumerate(chunk_text(page["text"], CHUNK_SIZE, CHUNK_OVERLAP)):
+            records.append({
+                "id": f"{filename}-p{page['page']}-c{c_idx}",
+                "text": chunk,
+                "metadata": {"source": filename, "page": page["page"]},
+            })
+
+    if not records:
+        return 0
+
+    client = genai.Client(api_key=GOOGLE_API_KEY)
+    vectors: list[list[float]] = []
+    for i in range(0, len(records), EMBED_BATCH_SIZE):
+        batch_texts = [r["text"] for r in records[i : i + EMBED_BATCH_SIZE]]
+        vectors.extend(embed_batch(client, batch_texts))
+        if i + EMBED_BATCH_SIZE < len(records):
+            time.sleep(BATCH_SLEEP_SECONDS)
+
+    chroma = chromadb.PersistentClient(path=CHROMA_PATH)
+    collection = chroma.get_or_create_collection(
+        name=CHROMA_COLLECTION,
+        metadata={"hnsw:space": "cosine"},
+    )
+    collection.upsert(
+        ids=[r["id"] for r in records],
+        documents=[r["text"] for r in records],
+        embeddings=vectors,
+        metadatas=[r["metadata"] for r in records],
+    )
+    return len(records)
 
 
 if __name__ == "__main__":
