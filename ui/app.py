@@ -1,16 +1,15 @@
-"""Streamlit chat UI for the Layer 1 RAG service.
+"""Streamlit chat UI.
 
-Run (with the FastAPI service already running):
-    streamlit run ui/app.py
+Calls generate_answer() directly (no HTTP) so this works both locally
+and on Hugging Face Spaces without a separate FastAPI process.
 """
 
 import uuid
 
-import requests
 import streamlit as st
 
+from src.chat import generate_answer
 
-API_URL = "http://localhost:8000/chat"
 
 st.set_page_config(page_title="Health Insurance Assistant", page_icon=":hospital:", layout="centered")
 
@@ -42,13 +41,11 @@ def render_citations(citations: list[dict]) -> None:
             )
 
 
-# Replay history
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         st.write(msg["text"])
         render_citations(msg.get("citations", []))
 
-# New message
 if prompt := st.chat_input("Ask a question about your health insurance policies..."):
     st.session_state.messages.append({"role": "user", "text": prompt})
     with st.chat_message("user"):
@@ -57,20 +54,14 @@ if prompt := st.chat_input("Ask a question about your health insurance policies.
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
             try:
-                resp = requests.post(
-                    API_URL,
-                    json={
-                        "session_id": st.session_state.session_id,
-                        "message": prompt,
-                    },
-                    timeout=60,
-                )
-                resp.raise_for_status()
-                data = resp.json()
-                answer = data["answer"]
-                citations = data.get("citations", [])
-            except requests.RequestException as e:
-                answer = f"Could not reach the API: {e}"
+                result = generate_answer(prompt, st.session_state.session_id)
+                answer = result.answer
+                citations = [
+                    {"source": c["source"], "page": c["page"], "score": c["score"]}
+                    for c in result.citations
+                ]
+            except Exception as e:
+                answer = f"Something went wrong: {e}"
                 citations = []
         st.write(answer)
         render_citations(citations)

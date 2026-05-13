@@ -1,3 +1,14 @@
+---
+title: Health Insurance Assistant
+emoji: 🏥
+colorFrom: blue
+colorTo: green
+sdk: streamlit
+sdk_version: 1.57.0
+app_file: ui/app.py
+pinned: false
+---
+
 # Conversational AI Customer Support Assistant — Indian Health Insurance
 
 A two-layer customer support assistant for the Indian health insurance domain.
