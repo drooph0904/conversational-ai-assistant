@@ -10,19 +10,19 @@ import requests
 import streamlit as st
 
 
-st.set_page_config(page_title="Health Insurance Assistant", page_icon=":hospital:")
+API_URL = "http://localhost:8000/chat"
 
-with st.sidebar:
-    st.header("Settings")
-    api_url = st.text_input("API URL", value="http://localhost:8000/chat")
-    if st.button("New conversation"):
+st.set_page_config(page_title="Health Insurance Assistant", page_icon=":hospital:", layout="centered")
+
+col1, col2 = st.columns([5, 1])
+with col1:
+    st.title("Health Insurance Assistant")
+    st.caption("Grounded answers from your policy documents. Refuses to guess when sources are insufficient.")
+with col2:
+    if st.button("New chat"):
         st.session_state.session_id = f"ui-{uuid.uuid4().hex[:8]}"
         st.session_state.messages = []
         st.rerun()
-    st.caption(f"Session: `{st.session_state.get('session_id', '(uninitialised)')}`")
-
-st.title("Health Insurance Assistant")
-st.caption("Grounded answers from your policy PDFs. Refuses to guess when sources are insufficient.")
 
 if "session_id" not in st.session_state:
     st.session_state.session_id = f"ui-{uuid.uuid4().hex[:8]}"
@@ -58,7 +58,7 @@ if prompt := st.chat_input("Ask a question about your health insurance policies.
         with st.spinner("Thinking..."):
             try:
                 resp = requests.post(
-                    api_url,
+                    API_URL,
                     json={
                         "session_id": st.session_state.session_id,
                         "message": prompt,
@@ -70,7 +70,7 @@ if prompt := st.chat_input("Ask a question about your health insurance policies.
                 answer = data["answer"]
                 citations = data.get("citations", [])
             except requests.RequestException as e:
-                answer = f"Could not reach the API at {api_url}: {e}"
+                answer = f"Could not reach the API: {e}"
                 citations = []
         st.write(answer)
         render_citations(citations)
