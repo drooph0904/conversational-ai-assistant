@@ -1,0 +1,62 @@
+[
+  {
+    "question": "What is the waiting period for pre-existing diseases under a 1-year Star Health Assure policy?",
+    "ground_truth": "Under a 1-year or 2-year Star Health Assure policy, expenses related to pre-existing diseases and their direct complications are excluded until the expiry of 36 months of continuous coverage after the date of inception of the first policy."
+  },
+  {
+    "question": "What is the waiting period for pre-existing diseases under a 3-year Star Health Assure policy?",
+    "ground_truth": "Under a 3-year Star Health Assure policy, expenses related to pre-existing diseases and their direct complications are excluded until the expiry of 30 months of continuous coverage after the date of inception of the first policy."
+  },
+  {
+    "question": "How many times is the sum insured automatically restored under Star Health Assure?",
+    "ground_truth": "The sum insured is restored unlimited number of times, up to 100% each time, which can be utilised for a subsequent hospitalisation. Restoration triggers immediately upon partial or full utilisation of the sum insured."
+  },
+  {
+    "question": "What is the waiting period for Assisted Reproduction Treatment under Star Health Assure?",
+    "ground_truth": "Assisted Reproduction Treatment has a waiting period of 24 months from the date of first inception of the policy with the Company for the insured person."
+  },
+  {
+    "question": "What is the maximum age limit for adults to be insured under Star Health Assure?",
+    "ground_truth": "The maximum age for adults to be covered under Star Health Assure is 75 years. The minimum entry age is 18 years."
+  },
+  {
+    "question": "How many family members can be covered under a Star Health Assure family floater policy?",
+    "ground_truth": "Up to 9 members of a family can be covered under the Star Health Assure family floater policy."
+  },
+  {
+    "question": "What is the maximum sum insured available under Star Health Assure?",
+    "ground_truth": "The maximum sum insured available under Star Health Assure is Rs. 2 Crore."
+  },
+  {
+    "question": "How many days notice must a policyholder give to cancel a Star Health Assure policy?",
+    "ground_truth": "The policyholder may cancel the Star Health Assure policy any time during the term by giving 7 days written notice."
+  },
+  {
+    "question": "Are day care treatments covered under Star Health Assure?",
+    "ground_truth": "Yes, all day care treatments are covered under Star Health Assure."
+  },
+  {
+    "question": "What is the waiting period for In Utero Fetal Surgery under Star Health Assure?",
+    "ground_truth": "In Utero Fetal Surgery and Interventions are covered after a waiting period of 24 months from the date of inception of the policy. This waiting period does not apply for treatment related to congenital internal disease or defects for the unborn."
+  },
+  {
+    "question": "What is the minimum hospitalisation period required to claim Group Hospital Cash Benefit?",
+    "ground_truth": "To claim the Group Hospital Cash Benefit, the insured person must be hospitalised for a minimum period of at least 2 days with a continuous and completed period of at least 24 hours. The benefit is payable from the first day of hospitalisation once this condition is met."
+  },
+  {
+    "question": "What is the waiting period for treatment of kidney stones under Group Health Insurance?",
+    "ground_truth": "Treatment for stones in the urinary system (kidney stones) is subject to a specific waiting period of 24 months from the date of commencement of coverage for the insured person."
+  },
+  {
+    "question": "Is treatment for refractive errors of the eye covered under Group Health Insurance?",
+    "ground_truth": "Treatment to correct refractive errors of the eye is excluded under Group Health Insurance unless it is required as the result of an Accident, or if the correction required is in excess of plus or minus 7.5 diopters."
+  },
+  {
+    "question": "What refund does a policyholder receive if they cancel Group Health Insurance before half the policy period has elapsed?",
+    "ground_truth": "If the Group Health Insurance policy is cancelled by the policyholder before half the policy period has elapsed (i.e. up to 1/2 of policy period), a 25% refund of the premium is provided. If cancelled within the first quarter (up to 1/4 of the policy period), a 50% refund applies."
+  },
+  {
+    "question": "Are sexually transmitted diseases covered under Group Health Insurance?",
+    "ground_truth": "No, sexually transmitted diseases are excluded under Group Health Insurance. This includes Genital Warts, Syphilis, Gonorrhoea, Genital Herpes, Chlamydia, Pubic Lice and Trichomoniasis."
+  }
+]
