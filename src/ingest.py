@@ -12,9 +12,8 @@ from io import BytesIO
 from pathlib import Path
 
 import chromadb
-from google import genai
-from google.genai import errors as genai_errors
-from google.genai import types
+from openai import OpenAI
+from openai import RateLimitError
 from pypdf import PdfReader
 
 from src.config import (
@@ -24,16 +23,16 @@ from src.config import (
     CHUNK_SIZE,
     DATA_DIR,
     EMBEDDING_MODEL,
-    GOOGLE_API_KEY,
+    OPENAI_API_KEY,
 )
 
 # Approximate token count via word count. ~0.75 words per token for English.
 WORDS_PER_TOKEN = 0.75
 
-# Free-tier embedding limit is ~30K tokens/min; small batches with pacing
-# keep us comfortably under that. Bump these on a paid plan.
-EMBED_BATCH_SIZE = 5
-BATCH_SLEEP_SECONDS = 12.0
+# OpenAI paid tier allows 3000 RPM / 1M TPM for text-embedding-3-small.
+# Large batches are fine; a short sleep avoids any burst-window issues.
+EMBED_BATCH_SIZE = 100
+BATCH_SLEEP_SECONDS = 0.5
 RATE_LIMIT_RETRY_WAIT_SECONDS = 60.0
 
 
@@ -69,27 +68,17 @@ def chunk_text(text: str, size_tokens: int, overlap_tokens: int) -> list[str]:
     return chunks
 
 
-def _embed_once(client: genai.Client, texts: list[str]) -> list[list[float]]:
-    # gemini-embedding-2 accepts one text per call (unlike gemini-embedding-001
-    # which accepted a batch). Loop and collect individually.
-    embeddings = []
-    for text in texts:
-        result = client.models.embed_content(
-            model=EMBEDDING_MODEL,
-            contents=text,
-            config=types.EmbedContentConfig(task_type="RETRIEVAL_DOCUMENT"),
-        )
-        embeddings.append(result.embeddings[0].values)
-    return embeddings
+def _embed_once(client: OpenAI, texts: list[str]) -> list[list[float]]:
+    # OpenAI embeddings accept a list of texts and return one vector per text.
+    result = client.embeddings.create(input=texts, model=EMBEDDING_MODEL)
+    return [item.embedding for item in result.data]
 
 
-def embed_batch(client: genai.Client, texts: list[str]) -> list[list[float]]:
-    """Embed a batch as RETRIEVAL_DOCUMENT vectors; retry once after a 429."""
+def embed_batch(client: OpenAI, texts: list[str]) -> list[list[float]]:
+    """Embed a batch; retry once after a 429."""
     try:
         return _embed_once(client, texts)
-    except genai_errors.ClientError as e:
-        if "429" not in str(e):
-            raise
+    except RateLimitError:
         print(f"  rate-limited; sleeping {RATE_LIMIT_RETRY_WAIT_SECONDS:.0f}s and retrying once ...")
         time.sleep(RATE_LIMIT_RETRY_WAIT_SECONDS)
         return _embed_once(client, texts)
@@ -117,7 +106,7 @@ def main() -> None:
     print(f"  {len(records)} chunks.")
 
     print(f"Embedding with {EMBEDDING_MODEL} (batch={EMBED_BATCH_SIZE}, pace={BATCH_SLEEP_SECONDS}s) ...")
-    client = genai.Client(api_key=GOOGLE_API_KEY)
+    client = OpenAI(api_key=OPENAI_API_KEY)
     vectors: list[list[float]] = []
     total = len(records)
     for i in range(0, total, EMBED_BATCH_SIZE):
@@ -174,7 +163,7 @@ def ingest_pdf_bytes(pdf_bytes: bytes, filename: str) -> int:
     if not records:
         return 0
 
-    client = genai.Client(api_key=GOOGLE_API_KEY)
+    client = OpenAI(api_key=OPENAI_API_KEY)
     vectors: list[list[float]] = []
     for i in range(0, len(records), EMBED_BATCH_SIZE):
         batch_texts = [r["text"] for r in records[i : i + EMBED_BATCH_SIZE]]

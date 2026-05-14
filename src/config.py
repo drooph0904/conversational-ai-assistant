@@ -26,15 +26,15 @@ load_dotenv()
 # Using os.environ[...] (not os.getenv) so a missing key raises KeyError
 # immediately on `import src.config`, instead of silently breaking the
 # first /chat request hours later.
-GOOGLE_API_KEY: str = os.environ["GOOGLE_API_KEY"]
+OPENAI_API_KEY: str = os.environ["OPENAI_API_KEY"]
 
 
 # ---------- Model selection ----------
 # Both sides of the pipeline (ingest and retrieve) must use the SAME embedding
 # model - otherwise the query vectors and document vectors live in different
 # spaces and similarity search returns garbage.
-EMBEDDING_MODEL: str = os.getenv("EMBEDDING_MODEL", "gemini-embedding-2")
-CHAT_MODEL: str = os.getenv("CHAT_MODEL", "gemini-2.0-flash-lite")
+EMBEDDING_MODEL: str = os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
+CHAT_MODEL: str = os.getenv("CHAT_MODEL", "gpt-4o-mini")
 
 
 # ---------- Paths ----------

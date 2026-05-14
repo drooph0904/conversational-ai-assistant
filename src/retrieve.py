@@ -7,14 +7,13 @@ RETRIEVAL_DOCUMENT). Scores are cosine similarity (1 = identical, 0 = unrelated)
 from dataclasses import dataclass
 
 import chromadb
-from google import genai
-from google.genai import types
+from openai import OpenAI
 
 from src.config import (
     CHROMA_COLLECTION,
     CHROMA_PATH,
     EMBEDDING_MODEL,
-    GOOGLE_API_KEY,
+    OPENAI_API_KEY,
     TOP_K,
 )
 
@@ -33,16 +32,12 @@ _collection = _chroma.get_or_create_collection(
     name=CHROMA_COLLECTION,
     metadata={"hnsw:space": "cosine"},
 )
-_genai = genai.Client(api_key=GOOGLE_API_KEY)
+_openai = OpenAI(api_key=OPENAI_API_KEY)
 
 
 def embed_query(query: str) -> list[float]:
-    result = _genai.models.embed_content(
-        model=EMBEDDING_MODEL,
-        contents=query,
-        config=types.EmbedContentConfig(task_type="RETRIEVAL_QUERY"),
-    )
-    return result.embeddings[0].values
+    result = _openai.embeddings.create(input=query, model=EMBEDDING_MODEL)
+    return result.data[0].embedding
 
 
 def retrieve(query: str, k: int = TOP_K) -> list[Chunk]:

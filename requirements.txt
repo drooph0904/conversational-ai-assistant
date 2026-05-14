@@ -1,7 +1,7 @@
 # Pinned with lower bounds; pip will pick compatible upper versions.
 # Re-pin to exact versions before deploying to Cloud Run.
 
-google-genai>=0.3.0
+openai>=1.0.0
 chromadb>=0.5.0
 pypdf>=5.0.0
 fastapi>=0.115.0

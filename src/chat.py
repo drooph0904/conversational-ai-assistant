@@ -12,12 +12,11 @@ Process-local; swap for Redis in production.
 from collections import defaultdict, deque
 from dataclasses import dataclass
 
-from google import genai
-from google.genai import types
+from openai import OpenAI
 
 from src.config import (
     CHAT_MODEL,
-    GOOGLE_API_KEY,
+    OPENAI_API_KEY,
     MAX_HISTORY_TURNS,
     RETRIEVE_K,
     SIMILARITY_THRESHOLD,
@@ -26,7 +25,7 @@ from src.rerank import rerank
 from src.retrieve import Chunk, retrieve
 
 
-_genai = genai.Client(api_key=GOOGLE_API_KEY)
+_openai = OpenAI(api_key=OPENAI_API_KEY)
 
 # session_id -> deque of (role, text); roles: "user", "model".
 # Cap stores 2 entries per "turn", so maxlen = MAX_HISTORY_TURNS * 2.
@@ -115,15 +114,15 @@ def generate_answer(query: str, session_id: str) -> ChatResult:
         + f"Context:\n{context_block}\n\nUser question: {query}"
     )
 
-    response = _genai.models.generate_content(
+    response = _openai.chat.completions.create(
         model=CHAT_MODEL,
-        contents=user_message,
-        config=types.GenerateContentConfig(
-            system_instruction=SYSTEM_PROMPT,
-            temperature=0.2,
-        ),
+        messages=[
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": user_message},
+        ],
+        temperature=0.2,
     )
-    answer = (response.text or "").strip() or FALLBACK_ANSWER
+    answer = (response.choices[0].message.content or "").strip() or FALLBACK_ANSWER
 
     _history[session_id].append(("user", query))
     _history[session_id].append(("model", answer))
