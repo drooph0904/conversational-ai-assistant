@@ -1,9 +1,14 @@
-"""Build grounded prompt, call Gemini, return answer + citations.
+"""Build grounded prompt, call OpenAI, return answer + citations.
 
 Two anti-hallucination guardrails:
   1. Strict system prompt: answer ONLY from context, else say "I don't know".
   2. Similarity-threshold short-circuit: if the best chunk scores below
      SIMILARITY_THRESHOLD, skip the LLM call entirely.
+
+Retrieval strategy (set via RETRIEVAL_STRATEGY env var):
+  "multi_query" — LLM rewrites query into N variants, union their results.
+  "hyde"        — LLM writes a hypothetical answer; embed that instead of query.
+  "standard"    — single-query dense retrieval (original baseline).
 
 In-memory per-session history (last MAX_HISTORY_TURNS user+model pairs).
 Process-local; swap for Redis in production.
@@ -16,13 +21,17 @@ from openai import OpenAI
 
 from src.config import (
     CHAT_MODEL,
-    OPENAI_API_KEY,
     MAX_HISTORY_TURNS,
+    MULTI_QUERY_N,
+    MULTI_QUERY_UNION_K,
+    OPENAI_API_KEY,
     RETRIEVE_K,
+    RETRIEVAL_STRATEGY,
     SIMILARITY_THRESHOLD,
 )
+from src.query_expansion import generate_alternative_queries, generate_hypothetical_answer
 from src.rerank import rerank
-from src.retrieve import Chunk, retrieve
+from src.retrieve import Chunk, retrieve, retrieve_hyde, retrieve_multi_query
 
 
 _openai = OpenAI(api_key=OPENAI_API_KEY)
@@ -80,8 +89,15 @@ def _format_context(chunks: list[Chunk]) -> str:
 
 
 def generate_answer(query: str, session_id: str) -> ChatResult:
-    # Stage 1: bi-encoder retrieval — wide net for recall.
-    candidates = retrieve(query, k=RETRIEVE_K)
+    # Stage 1: bi-encoder retrieval — strategy selects retrieval mode.
+    if RETRIEVAL_STRATEGY == "multi_query":
+        alt_queries = generate_alternative_queries(query, n=MULTI_QUERY_N)
+        candidates = retrieve_multi_query(alt_queries, k=RETRIEVE_K, union_k=MULTI_QUERY_UNION_K)
+    elif RETRIEVAL_STRATEGY == "hyde":
+        hypo = generate_hypothetical_answer(query)
+        candidates = retrieve_hyde(hypo, k=RETRIEVE_K)
+    else:
+        candidates = retrieve(query, k=RETRIEVE_K)
 
     # Guardrail: if the best bi-encoder score is below threshold, nothing
     # relevant exists. Skip reranker and LLM — saves cost and latency.

@@ -67,6 +67,16 @@ TOP_K: int = int(os.getenv("TOP_K", "3"))
 # save it either.
 SIMILARITY_THRESHOLD: float = float(os.getenv("SIMILARITY_THRESHOLD", "0.4"))
 
+# ---------- Retrieval strategy ----------
+# "multi_query" → LLM rewrites query into N variants, union results (best recall)
+# "hyde"        → LLM writes a hypothetical answer, embed that instead of the query
+# "standard"    → original single-query dense retrieval (baseline)
+RETRIEVAL_STRATEGY: str = os.getenv("RETRIEVAL_STRATEGY", "multi_query")
+MULTI_QUERY_N: int = int(os.getenv("MULTI_QUERY_N", "3"))
+MULTI_QUERY_UNION_K: int = int(os.getenv("MULTI_QUERY_UNION_K", "15"))
+HYDE_MAX_TOKENS: int = int(os.getenv("HYDE_MAX_TOKENS", "100"))
+
+
 # ---------- Reranking ----------
 # cross-encoder/ms-marco-MiniLM-L-6-v2: fine-tuned on 8.8M (query, passage)
 # pairs from MS MARCO. ~80 MB, runs in ~200 ms on CPU for 10 chunks.
