@@ -1,7 +1,11 @@
-"""Streamlit chat UI.
+"""Streamlit chat UI — unified Layer 1 + Layer 2 interface.
 
-Calls generate_answer() directly (no HTTP) so this works both locally
-and on Hugging Face Spaces without a separate FastAPI process.
+Routes each user message through src.intents.route() first:
+  - Claim status queries  → deterministic mock lookup  (Layer 2)
+  - Hospital lookups      → deterministic mock lookup  (Layer 2)
+  - Everything else       → generate_answer() / RAG    (Layer 1)
+
+Works both locally and on Hugging Face Spaces (no separate FastAPI process needed).
 """
 
 import uuid
@@ -10,6 +14,7 @@ import streamlit as st
 
 from src.chat import generate_answer
 from src.ingest import ingest_pdf_bytes
+from src.intents import route
 
 
 st.set_page_config(page_title="Health Insurance Assistant", page_icon=":hospital:", layout="centered")
@@ -57,6 +62,12 @@ with st.sidebar:
             use_container_width=True,
         )
 
+    st.divider()
+    st.markdown("**Try these:**")
+    st.caption("🔍 What is the status of claim 8823?")
+    st.caption("🏥 Find network hospitals in Mumbai")
+    st.caption("📄 What is the waiting period for pre-existing diseases?")
+
 col1, col2 = st.columns([5, 1])
 with col1:
     st.title("Health Insurance Assistant")
@@ -97,6 +108,8 @@ for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         st.write(msg["text"])
         render_citations(msg.get("citations", []))
+        if msg["role"] == "assistant" and msg.get("layer_label"):
+            st.caption(msg["layer_label"])
 
 if prompt := st.chat_input("Ask a question about your health insurance policies..."):
     st.session_state.messages.append({"role": "user", "text": prompt})
@@ -106,22 +119,33 @@ if prompt := st.chat_input("Ask a question about your health insurance policies.
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
             try:
-                result = generate_answer(prompt, st.session_state.session_id)
-                answer = result.answer
-                citations = [
-                    {"source": c["source"], "page": c["page"], "score": c["score"]}
-                    for c in result.citations
-                ]
+                intent, deterministic_reply = route(prompt)
+                if intent == "rag":
+                    result = generate_answer(prompt, st.session_state.session_id)
+                    answer = result.answer
+                    citations = [
+                        {"source": c["source"], "page": c["page"], "score": c["score"]}
+                        for c in result.citations
+                    ]
+                    layer_label = "Layer 1 — RAG"
+                else:
+                    answer = deterministic_reply
+                    citations = []
+                    layer_label = "Layer 2 — Deterministic"
             except Exception as e:
                 answer = f"Something went wrong: {e}"
                 citations = []
+                layer_label = ""
         st.write(answer)
         render_citations(citations)
+        if layer_label:
+            st.caption(layer_label)
 
     st.session_state.messages.append({
         "role": "assistant",
         "text": answer,
         "citations": citations,
+        "layer_label": layer_label,
     })
 
 st.divider()

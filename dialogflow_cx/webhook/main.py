@@ -12,56 +12,16 @@ Three handlers:
 Run: uvicorn dialogflow_cx.webhook.main:app --port 8001
 """
 
-import re
-
 import requests
 import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from src.config import RAG_API_URL, WEBHOOK_PORT
+from src.intents import handle_claim_status, handle_find_hospital
 
 
 app = FastAPI(title="Dialogflow CX Webhook", version="0.1.0")
-
-
-# ---------- Mock data (replaces a real DB in production) ----------
-
-CLAIM_STATUS: dict[str, str] = {
-    "8823": "Under Review",
-    "1234": "Approved",
-    "5678": "Rejected",
-    "9999": "Processing",
-    "4321": "Paid Out",
-}
-
-NETWORK_HOSPITALS: dict[str, list[str]] = {
-    "mumbai": [
-        "Kokilaben Dhirubhai Ambani Hospital, Andheri West",
-        "Lilavati Hospital, Bandra",
-        "Hinduja Hospital, Mahim",
-    ],
-    "delhi": [
-        "Apollo Hospital, Sarita Vihar",
-        "Fortis Hospital, Vasant Kunj",
-        "Max Super Speciality Hospital, Saket",
-    ],
-    "pune": [
-        "Ruby Hall Clinic, Camp",
-        "Jehangir Hospital, Sassoon Road",
-        "Sahyadri Hospital, Deccan",
-    ],
-    "bangalore": [
-        "Manipal Hospital, Old Airport Road",
-        "Fortis Hospital, Bannerghatta Road",
-        "Apollo Hospital, Bannerghatta Road",
-    ],
-    "hyderabad": [
-        "Apollo Hospital, Jubilee Hills",
-        "KIMS Hospital, Secunderabad",
-        "Care Hospital, Banjara Hills",
-    ],
-}
 
 
 # ---------- CX response builder ----------
@@ -73,39 +33,6 @@ def cx_response(message: str) -> dict:
             "messages": [{"text": {"text": [message]}}]
         }
     }
-
-
-# ---------- Intent handlers ----------
-
-def handle_claim_status(text: str) -> str:
-    # Extract first sequence of 4+ digits as the claim ID.
-    match = re.search(r"\b(\d{4,})\b", text)
-    if not match:
-        return (
-            "I need your claim ID to check the status. "
-            "Please say something like: 'Check status for claim 8823'."
-        )
-    claim_id = match.group(1)
-    status = CLAIM_STATUS.get(claim_id)
-    if status:
-        return f"Your claim {claim_id} is currently: {status}."
-    return (
-        f"I couldn't find claim ID {claim_id} in our system. "
-        "Please double-check your claim number."
-    )
-
-
-def handle_find_hospital(text: str) -> str:
-    text_lower = text.lower()
-    for city, hospitals in NETWORK_HOSPITALS.items():
-        if city in text_lower:
-            lines = "\n".join(f"• {h}" for h in hospitals)
-            return f"Network hospitals in {city.title()}:\n{lines}"
-    cities = ", ".join(c.title() for c in NETWORK_HOSPITALS)
-    return (
-        f"I have hospital listings for: {cities}. "
-        "Which city are you looking for?"
-    )
 
 
 def handle_faq(text: str, session_id: str) -> str:
