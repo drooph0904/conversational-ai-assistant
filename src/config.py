@@ -34,7 +34,7 @@ GOOGLE_API_KEY: str = os.environ["GOOGLE_API_KEY"]
 # model - otherwise the query vectors and document vectors live in different
 # spaces and similarity search returns garbage.
 EMBEDDING_MODEL: str = os.getenv("EMBEDDING_MODEL", "gemini-embedding-2")
-CHAT_MODEL: str = os.getenv("CHAT_MODEL", "gemini-2.0-flash")
+CHAT_MODEL: str = os.getenv("CHAT_MODEL", "gemini-2.0-flash-lite")
 
 
 # ---------- Paths ----------
