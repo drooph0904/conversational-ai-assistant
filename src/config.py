@@ -65,7 +65,7 @@ TOP_K: int = int(os.getenv("TOP_K", "3"))
 # If the best bi-encoder chunk scores below this, skip both reranker and LLM.
 # Cheap short-circuit: if nothing is close in embedding space, reranking won't
 # save it either.
-SIMILARITY_THRESHOLD: float = float(os.getenv("SIMILARITY_THRESHOLD", "0.6"))
+SIMILARITY_THRESHOLD: float = float(os.getenv("SIMILARITY_THRESHOLD", "0.4"))
 
 # ---------- Reranking ----------
 # cross-encoder/ms-marco-MiniLM-L-6-v2: fine-tuned on 8.8M (query, passage)
