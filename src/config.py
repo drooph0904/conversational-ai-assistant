@@ -60,13 +60,13 @@ CHUNK_OVERLAP: int = int(os.getenv("CHUNK_OVERLAP", "20"))
 # then the cross-encoder reranker cuts them down to TOP_K for the LLM prompt.
 # Wider first-stage net (10) catches relevant chunks that dense similarity
 # would rank lower; reranker reorders them more accurately.
-RETRIEVE_K: int = int(os.getenv("RETRIEVE_K", "15"))
+RETRIEVE_K: int = int(os.getenv("RETRIEVE_K", "20"))
 TOP_K: int = int(os.getenv("TOP_K", "5"))
 
 # If the best bi-encoder chunk scores below this, skip both reranker and LLM.
 # Cheap short-circuit: if nothing is close in embedding space, reranking won't
 # save it either.
-SIMILARITY_THRESHOLD: float = float(os.getenv("SIMILARITY_THRESHOLD", "0.4"))
+SIMILARITY_THRESHOLD: float = float(os.getenv("SIMILARITY_THRESHOLD", "0.3"))
 
 # ---------- Retrieval strategy ----------
 # "multi_query" → LLM rewrites query into N variants, union results (best recall)
@@ -74,7 +74,7 @@ SIMILARITY_THRESHOLD: float = float(os.getenv("SIMILARITY_THRESHOLD", "0.4"))
 # "standard"    → original single-query dense retrieval (baseline)
 RETRIEVAL_STRATEGY: str = os.getenv("RETRIEVAL_STRATEGY", "multi_query")
 MULTI_QUERY_N: int = int(os.getenv("MULTI_QUERY_N", "3"))
-MULTI_QUERY_UNION_K: int = int(os.getenv("MULTI_QUERY_UNION_K", "15"))
+MULTI_QUERY_UNION_K: int = int(os.getenv("MULTI_QUERY_UNION_K", "20"))
 HYDE_MAX_TOKENS: int = int(os.getenv("HYDE_MAX_TOKENS", "100"))
 
 
