@@ -106,3 +106,52 @@ def retrieve_hyde(hypothetical_answer: str, k: int = TOP_K) -> list[Chunk]:
     to actual document chunks than the raw user query would.
     """
     return retrieve(hypothetical_answer, k=k)
+
+
+_KEYWORD_STOPWORDS = {
+    "the", "is", "are", "there", "any", "in", "or", "of", "to", "and",
+    "for", "a", "an", "with", "this", "that", "which", "has", "does",
+    "what", "say", "about", "other", "policy", "insurance", "policies",
+    "health", "will", "not", "be", "have", "under", "if", "it", "as",
+    "from", "by", "at", "on", "their", "your", "our", "also", "than",
+    "how", "many", "much", "when", "where", "who", "why", "general",
+    "related", "regarding", "tell", "me", "covered", "cover", "claim",
+}
+
+
+def keyword_retrieve(terms: list[str], k: int = 3) -> list[Chunk]:
+    """Exact-text search via Chroma's $contains filter.
+
+    Guarantees retrieval of chunks that contain the search term verbatim,
+    regardless of embedding similarity. Used as a safety net for topics
+    that appear only in exclusion sections (different embedding space from
+    coverage-phrased queries).
+    """
+    seen_ids: set[str] = set()
+    chunks: list[Chunk] = []
+    for term in terms:
+        term = term.strip().lower()
+        if len(term) < 4 or term in _KEYWORD_STOPWORDS:
+            continue
+        try:
+            res = _collection.get(
+                where_document={"$contains": term},
+                include=["documents", "metadatas"],
+                limit=k,
+            )
+        except Exception:
+            continue
+        ids   = res.get("ids",       [])
+        docs  = res.get("documents", [])
+        metas = res.get("metadatas", [])
+        for chunk_id, doc, meta in zip(ids, docs, metas):
+            if chunk_id in seen_ids:
+                continue
+            seen_ids.add(chunk_id)
+            chunks.append(Chunk(
+                text=doc,
+                source=str(meta.get("source", "?")),
+                page=int(meta.get("page", 0)),
+                score=0.25,  # floor score; cross-encoder reranker will re-order
+            ))
+    return chunks

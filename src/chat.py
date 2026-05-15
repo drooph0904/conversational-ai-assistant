@@ -31,7 +31,28 @@ from src.config import (
 )
 from src.query_expansion import generate_alternative_queries, generate_hypothetical_answer
 from src.rerank import rerank
-from src.retrieve import Chunk, retrieve, retrieve_hyde, retrieve_multi_query, get_indexed_sources
+from src.retrieve import Chunk, retrieve, retrieve_hyde, retrieve_multi_query, keyword_retrieve, get_indexed_sources
+
+_KEYWORD_STOPWORDS = {
+    "the", "is", "are", "there", "any", "in", "or", "of", "to", "and",
+    "for", "a", "an", "with", "this", "that", "which", "has", "does",
+    "what", "say", "about", "other", "policy", "insurance", "policies",
+    "health", "will", "not", "be", "have", "under", "if", "it", "as",
+    "from", "by", "at", "on", "their", "your", "sbi", "star", "max",
+    "also", "tell", "related", "regarding", "covered", "cover", "claim",
+}
+
+
+def _key_terms(text: str) -> list[str]:
+    """Extract meaningful single words from a query for keyword search."""
+    words = text.lower().replace("?", "").replace(",", "").split()
+    seen: set[str] = set()
+    terms: list[str] = []
+    for w in words:
+        if len(w) >= 5 and w not in _KEYWORD_STOPWORDS and w not in seen:
+            seen.add(w)
+            terms.append(w)
+    return terms[:8]
 
 
 _openai = OpenAI(api_key=OPENAI_API_KEY)
@@ -111,6 +132,15 @@ def generate_answer(query: str, session_id: str) -> ChatResult:
         candidates = retrieve_hyde(hypo, k=RETRIEVE_K)
     else:
         candidates = retrieve(query, k=RETRIEVE_K)
+
+    # Keyword safety net: find chunks containing exact query terms, catching
+    # topics that appear only in exclusion sections (embedding space mismatch).
+    # Cross-encoder reranker will re-score these properly after merging.
+    existing_texts = {c.text for c in candidates}
+    for kchunk in keyword_retrieve(_key_terms(query)):
+        if kchunk.text not in existing_texts:
+            candidates.append(kchunk)
+            existing_texts.add(kchunk.text)
 
     # Guardrail: if the best bi-encoder score is below threshold, nothing
     # relevant exists. Skip reranker and LLM — saves cost and latency.
