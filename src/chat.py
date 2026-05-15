@@ -133,11 +133,13 @@ def generate_answer(query: str, session_id: str) -> ChatResult:
     else:
         candidates = retrieve(query, k=RETRIEVE_K)
 
-    # Keyword safety net: find chunks containing exact query terms, catching
-    # topics that appear only in exclusion sections (embedding space mismatch).
-    # Cross-encoder reranker will re-score these properly after merging.
+    # Keyword safety net: exact term matches for topics that only appear in
+    # exclusion sections and land far from the query in embedding space.
+    # These bypass the cross-encoder — exact-match evidence should always
+    # reach the LLM regardless of reranker scores.
+    kw_chunks = keyword_retrieve(_key_terms(query))
     existing_texts = {c.text for c in candidates}
-    for kchunk in keyword_retrieve(_key_terms(query)):
+    for kchunk in kw_chunks:
         if kchunk.text not in existing_texts:
             candidates.append(kchunk)
             existing_texts.add(kchunk.text)
@@ -154,7 +156,13 @@ def generate_answer(query: str, session_id: str) -> ChatResult:
         )
 
     # Stage 2: cross-encoder reranker — precision over the candidate set.
-    chunks = rerank(query, candidates)
+    reranked = rerank(query, candidates)
+
+    # Guarantee keyword chunks reach the LLM even when the cross-encoder
+    # (MS MARCO, general web) demotes domain-specific exclusion clauses.
+    reranked_texts = {c.text for c in reranked}
+    guaranteed = [kc for kc in kw_chunks if kc.text not in reranked_texts]
+    chunks = reranked + guaranteed
 
     retrieved_payload = [
         {

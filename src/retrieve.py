@@ -119,7 +119,7 @@ _KEYWORD_STOPWORDS = {
 }
 
 
-def keyword_retrieve(terms: list[str], k: int = 3) -> list[Chunk]:
+def keyword_retrieve(terms: list[str], k: int = 8) -> list[Chunk]:
     """Exact-text search via Chroma's $contains filter.
 
     Guarantees retrieval of chunks that contain the search term verbatim,
