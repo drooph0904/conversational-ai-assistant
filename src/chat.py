@@ -31,7 +31,7 @@ from src.config import (
 )
 from src.query_expansion import generate_alternative_queries, generate_hypothetical_answer
 from src.rerank import rerank
-from src.retrieve import Chunk, retrieve, retrieve_hyde, retrieve_multi_query
+from src.retrieve import Chunk, retrieve, retrieve_hyde, retrieve_multi_query, get_indexed_sources
 
 
 _openai = OpenAI(api_key=OPENAI_API_KEY)
@@ -42,15 +42,21 @@ _history: dict[str, deque] = defaultdict(
     lambda: deque(maxlen=MAX_HISTORY_TURNS * 2)
 )
 
-
 _ESCALATION = (
     "For further assistance, please speak with one of our support specialists "
     "at 1800-XXX-XXXX (toll-free, Mon–Sat 9 AM–6 PM IST)."
 )
 
+# Computed once at startup — lists every document currently in Chroma so the
+# LLM can answer "which policies do you have?" and cross-document comparisons.
+_INDEXED_SOURCES: str = get_indexed_sources()
+
 SYSTEM_PROMPT = (
     "You are a customer support assistant for Indian health insurance. "
+    f"The following policy documents are available in the knowledge base: {_INDEXED_SOURCES}. "
     "Answer the user's question using ONLY the context passages provided. "
+    "When asked which companies or policies are available, list the documents above. "
+    "When comparing policies, use the context to compare them directly and recommend clearly. "
     "If the context does not contain the answer, reply exactly with: "
     f"\"I don't have information about that in my knowledge base. {_ESCALATION}\" "
     "Do not use outside knowledge. Be concise. "
@@ -145,7 +151,7 @@ def generate_answer(query: str, session_id: str) -> ChatResult:
 
     citations = [
         {"source": c.source, "page": c.page, "score": round(c.score, 4)}
-        for c in chunks
+        for         c in chunks
     ]
     return ChatResult(
         answer=answer,

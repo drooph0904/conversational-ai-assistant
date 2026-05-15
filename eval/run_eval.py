@@ -25,16 +25,16 @@ from openai import OpenAI
 from datasets import Dataset
 from ragas import evaluate
 from ragas.llms import llm_factory
-from ragas.embeddings import embedding_factory
-from ragas.metrics.collections import (
-    faithfulness,
-    answer_relevancy,
-    context_precision,
-    context_recall,
-)
+# Use the classic singleton metrics — they implement ragas.metrics.base.Metric
+# which is required by evaluate(). The .collections classes use a different
+# base class incompatible with the standard evaluate() pipeline.
+import warnings
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore", DeprecationWarning)
+    from ragas.metrics import faithfulness, context_precision, context_recall
 
 from src.chat import generate_answer
-from src.config import OPENAI_API_KEY, CHAT_MODEL, EMBEDDING_MODEL
+from src.config import OPENAI_API_KEY, CHAT_MODEL
 
 TEST_SET_PATH = PROJECT_ROOT / "eval" / "test_set.json"
 RESULTS_PATH  = PROJECT_ROOT / "eval" / "results.json"
@@ -87,15 +87,14 @@ def run() -> None:
     })
 
     # Wire RAGAS to use the same model already configured in config.py.
-    _client    = OpenAI(api_key=OPENAI_API_KEY)
-    llm        = llm_factory(CHAT_MODEL, client=_client)
-    embeddings = embedding_factory("openai", model=EMBEDDING_MODEL, client=_client)
+    # evaluate() auto-injects the llm into each MetricWithLLM metric.
+    _client = OpenAI(api_key=OPENAI_API_KEY)
+    llm     = llm_factory(CHAT_MODEL, client=_client)
 
     scores = evaluate(
         dataset,
-        metrics=[faithfulness, answer_relevancy, context_precision, context_recall],
+        metrics=[faithfulness, context_precision, context_recall],
         llm=llm,
-        embeddings=embeddings,
     )
 
     print("\n" + "=" * 50)
@@ -103,10 +102,9 @@ def run() -> None:
     print("=" * 50)
     scores_df = scores.to_pandas()
     summary = {
-        "faithfulness":       round(float(scores_df["faithfulness"].mean()),       4),
-        "answer_relevancy":   round(float(scores_df["answer_relevancy"].mean()),   4),
-        "context_precision":  round(float(scores_df["context_precision"].mean()),  4),
-        "context_recall":     round(float(scores_df["context_recall"].mean()),     4),
+        "faithfulness":      round(float(scores_df["faithfulness"].mean()),      4),
+        "context_precision": round(float(scores_df["context_precision"].mean()), 4),
+        "context_recall":    round(float(scores_df["context_recall"].mean()),    4),
     }
     for metric, score in summary.items():
         bar = "█" * int(score * 20)
@@ -121,7 +119,6 @@ def run() -> None:
         "per_question": [
             {**detail, "ragas_scores": {
                 "faithfulness":      round(float(scores_df["faithfulness"].iloc[i]),      4),
-                "answer_relevancy":  round(float(scores_df["answer_relevancy"].iloc[i]),  4),
                 "context_precision": round(float(scores_df["context_precision"].iloc[i]), 4),
                 "context_recall":    round(float(scores_df["context_recall"].iloc[i]),    4),
             }}

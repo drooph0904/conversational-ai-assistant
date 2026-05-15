@@ -47,11 +47,12 @@ CHROMA_COLLECTION: str = os.getenv("CHROMA_COLLECTION", "health_insurance")
 
 
 # ---------- Chunking ----------
-# 500 tokens: large enough to hold a complete fact, focused enough that the
-# embedding represents one topic. 50-token overlap (~10%) prevents losing
-# facts that straddle a chunk boundary.
-CHUNK_SIZE: int = int(os.getenv("CHUNK_SIZE", "500"))
-CHUNK_OVERLAP: int = int(os.getenv("CHUNK_OVERLAP", "50"))
+# 200 tokens: small enough that the embedding represents a single specific fact
+# (e.g. one clause, one waiting period) rather than an average of an entire
+# section. Smaller chunks = better retrieval precision for short specific queries.
+# 20-token overlap (~10%) prevents facts split at a boundary from being lost.
+CHUNK_SIZE: int = int(os.getenv("CHUNK_SIZE", "200"))
+CHUNK_OVERLAP: int = int(os.getenv("CHUNK_OVERLAP", "20"))
 
 
 # ---------- Retrieval ----------
@@ -59,8 +60,8 @@ CHUNK_OVERLAP: int = int(os.getenv("CHUNK_OVERLAP", "50"))
 # then the cross-encoder reranker cuts them down to TOP_K for the LLM prompt.
 # Wider first-stage net (10) catches relevant chunks that dense similarity
 # would rank lower; reranker reorders them more accurately.
-RETRIEVE_K: int = int(os.getenv("RETRIEVE_K", "10"))
-TOP_K: int = int(os.getenv("TOP_K", "3"))
+RETRIEVE_K: int = int(os.getenv("RETRIEVE_K", "15"))
+TOP_K: int = int(os.getenv("TOP_K", "5"))
 
 # If the best bi-encoder chunk scores below this, skip both reranker and LLM.
 # Cheap short-circuit: if nothing is close in embedding space, reranking won't

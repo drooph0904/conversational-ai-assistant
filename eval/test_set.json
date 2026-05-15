@@ -1,31 +1,23 @@
 [
   {
-    "question": "What is the waiting period for pre-existing diseases under a 1-year Star Health Assure policy?",
-    "ground_truth": "Under a 1-year or 2-year Star Health Assure policy, expenses related to pre-existing diseases and their direct complications are excluded until the expiry of 36 months of continuous coverage after the date of inception of the first policy."
+    "question": "Which insurance policy documents are available in the knowledge base?",
+    "ground_truth": "The knowledge base contains two policy documents: the Star Health Assure Insurance Policy brochure and the Group Health Insurance policy document by Max Bupa Health Insurance Company."
   },
   {
-    "question": "What is the waiting period for pre-existing diseases under a 3-year Star Health Assure policy?",
-    "ground_truth": "Under a 3-year Star Health Assure policy, expenses related to pre-existing diseases and their direct complications are excluded until the expiry of 30 months of continuous coverage after the date of inception of the first policy."
+    "question": "Which policy covers Assisted Reproduction Treatment?",
+    "ground_truth": "The Star Health Assure Insurance Policy covers Assisted Reproduction Treatment, subject to a waiting period of 24 months from the date of first inception of the policy. The company pays for one Assisted Reproduction Treatment cycle in a policy year."
   },
   {
-    "question": "How many times is the sum insured automatically restored under Star Health Assure?",
-    "ground_truth": "The sum insured is restored unlimited number of times, up to 100% each time, which can be utilised for a subsequent hospitalisation. Restoration triggers immediately upon partial or full utilisation of the sum insured."
+    "question": "Which policy offers automatic restoration of the sum insured?",
+    "ground_truth": "The Star Health Assure Insurance Policy provides automatic restoration of the sum insured, unlimited number of times and up to 100% each time, triggered immediately upon partial or full utilisation of the sum insured."
   },
   {
-    "question": "What is the waiting period for Assisted Reproduction Treatment under Star Health Assure?",
-    "ground_truth": "Assisted Reproduction Treatment has a waiting period of 24 months from the date of first inception of the policy with the Company for the insured person."
+    "question": "Compare the waiting period for pre-existing diseases between Star Health Assure and Group Health Insurance.",
+    "ground_truth": "Star Health Assure: 36 months for 1-year and 2-year policies, 30 months for 3-year policies. Group Health Insurance specifies waiting periods for specific conditions (e.g. 24 months for kidney stones, tonsils) but does not state a blanket PED waiting period in the same way."
   },
   {
-    "question": "What is the maximum age limit for adults to be insured under Star Health Assure?",
-    "ground_truth": "The maximum age for adults to be covered under Star Health Assure is 75 years. The minimum entry age is 18 years."
-  },
-  {
-    "question": "How many family members can be covered under a Star Health Assure family floater policy?",
-    "ground_truth": "Up to 9 members of a family can be covered under the Star Health Assure family floater policy."
-  },
-  {
-    "question": "What is the maximum sum insured available under Star Health Assure?",
-    "ground_truth": "The maximum sum insured available under Star Health Assure is Rs. 2 Crore."
+    "question": "Which policy would be better for a family wanting to cover up to 9 members under one plan?",
+    "ground_truth": "Star Health Assure is the better choice as it explicitly allows up to 9 members of a family under a single family floater policy, covering adults from 18 to 75 years and dependent children from 16 days to 25 years."
   },
   {
     "question": "How many days notice must a policyholder give to cancel a Star Health Assure policy?",
@@ -33,30 +25,58 @@
   },
   {
     "question": "Are day care treatments covered under Star Health Assure?",
-    "ground_truth": "Yes, all day care treatments are covered under Star Health Assure."
+    "ground_truth": "Yes, all day care treatments are covered under Star Health Assure Insurance Policy."
   },
   {
-    "question": "What is the waiting period for In Utero Fetal Surgery under Star Health Assure?",
-    "ground_truth": "In Utero Fetal Surgery and Interventions are covered after a waiting period of 24 months from the date of inception of the policy. This waiting period does not apply for treatment related to congenital internal disease or defects for the unborn."
+    "question": "What is the waiting period for pre-existing diseases under a 1-year Star Health Assure policy?",
+    "ground_truth": "Under a 1-year or 2-year Star Health Assure policy, pre-existing diseases are excluded until the expiry of 36 months of continuous coverage after the date of inception of the first policy."
+  },
+  {
+    "question": "What is the waiting period for pre-existing diseases under a 3-year Star Health Assure policy?",
+    "ground_truth": "Under a 3-year Star Health Assure policy, pre-existing diseases are excluded until the expiry of 30 months of continuous coverage after the date of inception of the first policy."
+  },
+  {
+    "question": "What is the maximum sum insured available under Star Health Assure?",
+    "ground_truth": "The maximum sum insured available under Star Health Assure is Rs. 2 Crore."
   },
   {
     "question": "What is the minimum hospitalisation period required to claim Group Hospital Cash Benefit?",
-    "ground_truth": "To claim the Group Hospital Cash Benefit, the insured person must be hospitalised for a minimum period of at least 2 days with a continuous and completed period of at least 24 hours. The benefit is payable from the first day of hospitalisation once this condition is met."
+    "ground_truth": "The insured person must be hospitalised for a minimum of 2 days with a continuous and completed period of at least 24 hours to claim the Group Hospital Cash Benefit."
   },
   {
     "question": "What is the waiting period for treatment of kidney stones under Group Health Insurance?",
-    "ground_truth": "Treatment for stones in the urinary system (kidney stones) is subject to a specific waiting period of 24 months from the date of commencement of coverage for the insured person."
+    "ground_truth": "Treatment for stones in the urinary system (kidney stones) is subject to a specific waiting period of 24 months from the date of commencement of coverage under Group Health Insurance."
   },
   {
-    "question": "Is treatment for refractive errors of the eye covered under Group Health Insurance?",
-    "ground_truth": "Treatment to correct refractive errors of the eye is excluded under Group Health Insurance unless it is required as the result of an Accident, or if the correction required is in excess of plus or minus 7.5 diopters."
-  },
-  {
-    "question": "What refund does a policyholder receive if they cancel Group Health Insurance before half the policy period has elapsed?",
-    "ground_truth": "If the Group Health Insurance policy is cancelled by the policyholder before half the policy period has elapsed (i.e. up to 1/2 of policy period), a 25% refund of the premium is provided. If cancelled within the first quarter (up to 1/4 of the policy period), a 50% refund applies."
+    "question": "What refund does a policyholder get if they cancel Group Health Insurance before a quarter of the policy period has elapsed?",
+    "ground_truth": "If the policyholder cancels Group Health Insurance within the first quarter (up to 1/4 of the policy period), a 50% refund of the premium is provided."
   },
   {
     "question": "Are sexually transmitted diseases covered under Group Health Insurance?",
-    "ground_truth": "No, sexually transmitted diseases are excluded under Group Health Insurance. This includes Genital Warts, Syphilis, Gonorrhoea, Genital Herpes, Chlamydia, Pubic Lice and Trichomoniasis."
+    "ground_truth": "No, treatment for sexually transmitted diseases including Genital Warts, Syphilis, Gonorrhoea, Genital Herpes, Chlamydia, Pubic Lice and Trichomoniasis is excluded under Group Health Insurance."
+  },
+  {
+    "question": "Which policy is better for a young couple wanting maternity or fertility treatment coverage?",
+    "ground_truth": "Star Health Assure is the better option as it explicitly covers Assisted Reproduction Treatment after a 24-month waiting period and covers In Utero Fetal Surgery after 24 months. The Group Health Insurance policy document does not mention such benefits."
+  },
+  {
+    "question": "What specific conditions have a 24-month waiting period under Group Health Insurance?",
+    "ground_truth": "The following conditions have a 24-month specific waiting period under Group Health Insurance: stones in the urinary system, stones in the biliary system, surgery on tonsils or adenoids, uterine polyps, any type of breast lumps, treatment for spondylosis or spondylitis, and inter-vertebral disc prolapse (IVDP)."
+  },
+  {
+    "question": "How many times is the sum insured automatically restored under Star Health Assure and what is the restoration limit?",
+    "ground_truth": "Under Star Health Assure, the sum insured is restored an unlimited number of times, up to 100% each time. Restoration triggers immediately upon partial or full utilisation and can be used for a subsequent hospitalisation."
+  },
+  {
+    "question": "Is treatment for refractive errors of the eye covered under Group Health Insurance?",
+    "ground_truth": "Treatment for refractive errors of the eye is excluded under Group Health Insurance unless it results from an Accident or the correction required exceeds plus or minus 7.5 diopters."
+  },
+  {
+    "question": "What is the maximum age limit for adults under Star Health Assure and what is the minimum entry age for children?",
+    "ground_truth": "The maximum age for adults under Star Health Assure is 75 years with a minimum of 18 years. Dependent children can be covered from a minimum of 16 days up to 25 years of age."
+  },
+  {
+    "question": "Which policy covers non-medical consumable items during hospitalisation?",
+    "ground_truth": "Star Health Assure covers non-medical consumable items subject to an admissible claim under the policy. Details are available on the Star Health website."
   }
 ]

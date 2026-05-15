@@ -36,6 +36,13 @@ _collection = _chroma.get_or_create_collection(
 _openai = OpenAI(api_key=OPENAI_API_KEY)
 
 
+def get_indexed_sources() -> str:
+    """Return a comma-separated list of unique document names in the collection."""
+    results = _collection.get(limit=10000, include=["metadatas"])
+    sources = sorted(set(m["source"] for m in results["metadatas"]))
+    return ", ".join(sources) if sources else "no documents indexed yet"
+
+
 def embed_query(query: str) -> list[float]:
     result = _openai.embeddings.create(input=query, model=EMBEDDING_MODEL)
     return result.data[0].embedding
