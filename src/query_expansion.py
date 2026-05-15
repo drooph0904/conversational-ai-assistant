@@ -23,6 +23,10 @@ _MULTI_QUERY_SYSTEM = (
     "(e.g. IHIP, OPD, ICU, PED, SI, NCB, TPA, GST, AYUSH)\n"
     "- Rephrase to match how insurance policy text is written, not how a "
     "customer speaks\n"
+    "- ALWAYS include at least one variant that searches for the topic as an "
+    "EXCLUSION or NOT COVERED clause — e.g. if asked about 'pregnancy coverage', "
+    "generate a variant like 'pregnancy childbirth excluded not covered' because "
+    "many insurance topics appear only in the exclusions section of the policy\n"
     "- Cover different aspects (duration, eligibility, exclusions, renewal)\n"
     "Output exactly {n} queries, one per line. No numbering, no explanation."
 )
