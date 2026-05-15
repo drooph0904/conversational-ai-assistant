@@ -47,21 +47,21 @@ _ESCALATION = (
     "at 1800-XXX-XXXX (toll-free, Mon–Sat 9 AM–6 PM IST)."
 )
 
-# Computed once at startup — lists every document currently in Chroma so the
-# LLM can answer "which policies do you have?" and cross-document comparisons.
-_INDEXED_SOURCES: str = get_indexed_sources()
-
-SYSTEM_PROMPT = (
-    "You are a customer support assistant for Indian health insurance. "
-    f"The following policy documents are available in the knowledge base: {_INDEXED_SOURCES}. "
-    "Answer the user's question using ONLY the context passages provided. "
-    "When asked which companies or policies are available, list the documents above. "
-    "When comparing policies, use the context to compare them directly and recommend clearly. "
-    "If the context does not contain the answer, reply exactly with: "
-    f"\"I don't have information about that in my knowledge base. {_ESCALATION}\" "
-    "Do not use outside knowledge. Be concise. "
-    "Cite the sources you used inline as [source filename, page N]."
-)
+def _build_system_prompt() -> str:
+    # Re-reads Chroma metadata on every call so newly uploaded PDFs are
+    # reflected immediately without a server restart.
+    indexed_sources = get_indexed_sources()
+    return (
+        "You are a customer support assistant for Indian health insurance. "
+        f"The following policy documents are available in the knowledge base: {indexed_sources}. "
+        "Answer the user's question using ONLY the context passages provided. "
+        "When asked which companies or policies are available, list the documents above. "
+        "When comparing policies, use the context to compare them directly and recommend clearly. "
+        "If the context does not contain the answer, reply exactly with: "
+        f"\"I don't have information about that in my knowledge base. {_ESCALATION}\" "
+        "Do not use outside knowledge. Be concise. "
+        "Cite the sources you used inline as [source filename, page N]."
+    )
 
 FALLBACK_ANSWER = (
     f"I don't have information about that in my knowledge base. {_ESCALATION}"
@@ -139,7 +139,7 @@ def generate_answer(query: str, session_id: str) -> ChatResult:
     response = _openai.chat.completions.create(
         model=CHAT_MODEL,
         messages=[
-            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "system", "content": _build_system_prompt()},
             {"role": "user", "content": user_message},
         ],
         temperature=0.2,
