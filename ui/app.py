@@ -299,6 +299,17 @@ hr { border-color: #F5F5F5 !important; }
     padding: 10px 0 4px;
 }
 
+/* ── Force readable text in chat bubbles ──────────────── */
+[data-testid="stChatMessage"] p,
+[data-testid="stChatMessage"] li,
+[data-testid="stChatMessage"] span,
+[data-testid="stChatMessage"] div,
+[data-testid="stMarkdownContainer"] p,
+[data-testid="stMarkdownContainer"] li,
+[data-testid="stMarkdownContainer"] span {
+    color: #1A1A1A !important;
+}
+
 /* ── Custom scrollbar ─────────────────────────────────── */
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
