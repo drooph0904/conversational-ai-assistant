@@ -55,6 +55,26 @@ def _key_terms(text: str) -> list[str]:
     return terms[:8]
 
 
+_KB_META_PATTERNS = [
+    "which company", "which companies", "which insurer", "which insurers",
+    "which insurance", "which policies", "which policy", "which document",
+    "what company", "what companies", "what insurer", "what insurance",
+    "what policies", "what policy", "what documents", "what do you have",
+    "what are you trained", "what data do you", "available policies",
+    "available companies", "available documents", "available insurers",
+    "do you have", "you have data", "you have information",
+    "list of policies", "list of companies", "list of insurers",
+    "tell me about the policies", "tell me what policies",
+    "which plans", "what plans", "available plans",
+]
+
+
+def _is_kb_meta_query(query: str) -> bool:
+    """Return True if the user is asking about what's in the knowledge base."""
+    q = query.lower().strip()
+    return any(pattern in q for pattern in _KB_META_PATTERNS)
+
+
 _openai = OpenAI(api_key=OPENAI_API_KEY)
 
 # session_id -> deque of (role, text); roles: "user", "model".
@@ -122,7 +142,35 @@ def _format_context(chunks: list[Chunk]) -> str:
     return "\n\n".join(blocks)
 
 
+def _answer_kb_meta(query: str, session_id: str) -> ChatResult:
+    """Answer questions about what's in the knowledge base — no retrieval needed."""
+    indexed_sources = get_indexed_sources()
+    prompt = (
+        f"The user asked: \"{query}\"\n\n"
+        f"The following policy documents are currently loaded in the knowledge base:\n{indexed_sources}\n\n"
+        "List each document clearly and tell the user what they can ask about. "
+        "Be friendly and conversational."
+    )
+    response = _openai.chat.completions.create(
+        model=CHAT_MODEL,
+        messages=[
+            {"role": "system", "content": _build_system_prompt()},
+            {"role": "user", "content": prompt},
+        ],
+        temperature=0.3,
+    )
+    answer = (response.choices[0].message.content or "").strip()
+    _history[session_id].append(("user", query))
+    _history[session_id].append(("model", answer))
+    return ChatResult(answer=answer, citations=[], retrieved_chunks=[])
+
+
 def generate_answer(query: str, session_id: str) -> ChatResult:
+    # Short-circuit for meta-questions about available documents — these have
+    # no matching chunks in the vector store so retrieval always fails them.
+    if _is_kb_meta_query(query):
+        return _answer_kb_meta(query, session_id)
+
     # Stage 1: bi-encoder retrieval — strategy selects retrieval mode.
     if RETRIEVAL_STRATEGY == "multi_query":
         alt_queries = generate_alternative_queries(query, n=MULTI_QUERY_N)
