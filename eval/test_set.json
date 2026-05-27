@@ -1,44 +1,119 @@
 [
   {
-    "question": "Which insurance policy documents are available in the knowledge base?",
-    "ground_truth": "The knowledge base contains two policy documents: the Star Health Assure Insurance Policy brochure and the Group Health Insurance policy document by Max Bupa Health Insurance Company."
+    "question": "Which insurance companies have policy documents in the knowledge base?",
+    "ground_truth": "The knowledge base contains policy documents from three insurance companies: SBI General Insurance Company Limited (Health Insurance Policy Retail), Star Health and Allied Insurance (Star Health Assure Insurance Policy), and a Group Health Insurance policy."
   },
+
+  {
+    "question": "What is the grace period for premium payment under SBI health insurance?",
+    "ground_truth": "The grace period under SBI health insurance is 15 days immediately following the premium due date. During this period a payment can be made to renew or continue the policy without loss of continuity benefits such as waiting periods and coverage of pre-existing conditions."
+  },
+  {
+    "question": "What is the ambulance expense reimbursement limit under SBI health insurance?",
+    "ground_truth": "Under SBI health insurance, ambulance expenses are reimbursed at 1% of the Sum Insured per policy period, up to a maximum of INR 1,500."
+  },
+  {
+    "question": "How many consecutive claim-free years are required to get a free medical check-up under SBI health insurance?",
+    "ground_truth": "Under SBI health insurance, a free medical check-up is available for every four consecutive claim-free years. The insurer reimburses the cost up to 1% of the Sum Insured, subject to a maximum of INR 2,500."
+  },
+  {
+    "question": "What is the waiting period for pre-existing diseases under SBI health insurance?",
+    "ground_truth": "Under SBI health insurance, pre-existing diseases are excluded until 48 consecutive months have elapsed from the date of inception of the first policy. This exclusion ceases after the insured has maintained the policy continuously for a full 4 years without a break."
+  },
+  {
+    "question": "What is the dispute resolution mechanism under SBI health insurance?",
+    "ground_truth": "Under SBI health insurance, disputes about the quantum to be paid are referred to a sole Arbitrator appointed in writing by both parties. If they cannot agree within 30 days, the dispute goes to a panel of 3 Arbitrators. Arbitration is conducted under the Arbitration and Conciliation Act 1996, governed by Indian law, with hearings held in India."
+  },
+  {
+    "question": "What is the co-payment percentage at non-network hospitals under SBI health insurance?",
+    "ground_truth": "Under SBI health insurance, for all admissible claims in non-network hospitals, the insured must bear 10% of the admissible claim amount in addition to any excess as per the terms of insurance."
+  },
+  {
+    "question": "What is the Convalescence Benefit under SBI health insurance and who is eligible?",
+    "ground_truth": "The Convalescence Benefit under SBI health insurance pays INR 5,000 per insured person if they are hospitalised for any bodily injury or illness covered under the policy for a continuous period of 10 or more days. It is available only for insured persons aged above 10 years and below 60 years, and is payable once per insured per policy period."
+  },
+  {
+    "question": "Is maternity or childbirth covered under SBI health insurance?",
+    "ground_truth": "No. Treatment arising from or traceable to pregnancy, childbirth, miscarriage, abortion, or complications including caesarean section is excluded under SBI health insurance. The only exception is abdominal surgery for ectopic pregnancy, provided it is proved by Ultra Sonographic Report and certified by a Gynaecologist as life threatening."
+  },
+  {
+    "question": "What documents are required to file a reimbursement claim under SBI health insurance?",
+    "ground_truth": "To file a reimbursement claim under SBI health insurance the insured must submit: a duly filled claim form, valid photo identity card, original discharge card or certificate or death summary, copies of prescriptions for diagnostic tests, treatment advice and medical references, original investigation reports, and itemised original hospital bills, receipts, and pharmacy bills with prescriptions."
+  },
+  {
+    "question": "What is the cumulative bonus policy under SBI health insurance?",
+    "ground_truth": "Under SBI health insurance, if no claim is made and the policy is renewed without a break, a cumulative bonus of 5% of the Sum Insured is added automatically at renewal each year, up to a maximum of 25% of the Sum Insured in any policy year. If a claim is made, the cumulative bonus is reduced to Nil at the time of renewal."
+  },
+  {
+    "question": "What refund does the insured get if they cancel SBI health insurance within one month with no claim?",
+    "ground_truth": "If the insured cancels SBI health insurance within up to one month of commencement and no claim has been made, a refund of 75% of the annual premium rate is provided for the unexpired policy period."
+  },
+  {
+    "question": "Are Ayurvedic treatments covered under SBI health insurance?",
+    "ground_truth": "Yes. Ayurvedic treatment is covered under SBI health insurance up to 15% of the Sum Insured per policy period, subject to a maximum of INR 20,000. Treatment must be taken at an Ayurvedic hospital registered with local government bodies for that purpose."
+  },
+  {
+    "question": "What diseases are excluded from domiciliary hospitalisation under SBI health insurance?",
+    "ground_truth": "Under SBI health insurance, domiciliary hospitalisation does not cover treatment for: Asthma, Bronchitis, Chronic Nephritis and Nephritic Syndrome, Diarrhoea and all types of Dysenteries including Gastro-enteritis, Diabetes Mellitus and Insipidus, Epilepsy, Hypertension, Influenza Cough and Cold, all Psychiatric or Psychosomatic Disorders, Pyrexia of unknown origin for less than 10 days, Tonsillitis and Upper Respiratory Tract Infections including Laryngitis and Pharyngitis, and Arthritis Gout and Rheumatism."
+  },
+  {
+    "question": "What is the Child Care benefit under SBI health insurance?",
+    "ground_truth": "Under SBI health insurance, the Child Care benefit pays INR 500 for each completed day of hospitalisation of a child below 10 years of age, subject to a maximum of 30 days during the policy period. The escort person covered includes the mother, father, grandfather, grandmother, and any immediate family member."
+  },
+  {
+    "question": "What is the limit for cataract treatment under SBI health insurance?",
+    "ground_truth": "Under SBI health insurance, cataract treatment including surgery is limited to 15% of the Sum Insured, subject to a maximum of INR 25,000 per eye. Cataract is also subject to a two-year exclusion from the commencement of the policy."
+  },
+  {
+    "question": "Is cosmetic surgery covered under SBI health insurance?",
+    "ground_truth": "No. Cosmetic or aesthetic treatments of any description, treatment or surgery for change of life or gender, Lasik treatment for refractive error, and any form of plastic surgery are excluded under SBI health insurance unless they are medically necessary for treatment of an illness or accidental bodily injury."
+  },
+  {
+    "question": "What happens if a fraudulent claim is filed under SBI health insurance?",
+    "ground_truth": "If any claim under SBI health insurance is found to be fraudulent, or if any false statement or declaration is made in support of a claim, all benefits under the policy shall be forfeited. The insurer has the right to reclaim all benefits already paid in respect of such a fraudulent claim."
+  },
+  {
+    "question": "What is the room rent sub-limit under SBI health insurance?",
+    "ground_truth": "Under SBI health insurance, room, board and nursing expenses are covered up to 1% of the Sum Insured per day for a normal room, and up to 2% of the Sum Insured per day for an Intensive Care Unit. All admissible claims under room, board and nursing including ICU during the policy period are restricted to a maximum of 25% of the Sum Insured per illness or injury."
+  },
+  {
+    "question": "What is the Parental Care benefit under SBI health insurance?",
+    "ground_truth": "The Parental Care benefit under SBI health insurance is available for insured persons above 60 years of age. The insurer pays INR 500 per day (or actual, whichever is lesser) for attendant nursing expenses after discharge from hospital, up to a maximum of 10 days per hospitalisation. The total reimbursable period cannot exceed 15 days during the entire policy period."
+  },
+
   {
     "question": "Which policy covers Assisted Reproduction Treatment?",
     "ground_truth": "The Star Health Assure Insurance Policy covers Assisted Reproduction Treatment, subject to a waiting period of 24 months from the date of first inception of the policy. The company pays for one Assisted Reproduction Treatment cycle in a policy year."
   },
   {
-    "question": "Which policy offers automatic restoration of the sum insured?",
-    "ground_truth": "The Star Health Assure Insurance Policy provides automatic restoration of the sum insured, unlimited number of times and up to 100% each time, triggered immediately upon partial or full utilisation of the sum insured."
+    "question": "How many times is the sum insured automatically restored under Star Health Assure and what is the restoration limit?",
+    "ground_truth": "Under Star Health Assure, the sum insured is restored an unlimited number of times, up to 100% each time. Restoration triggers immediately upon partial or full utilisation and can be used for a subsequent hospitalisation."
   },
   {
-    "question": "Compare the waiting period for pre-existing diseases between Star Health Assure and Group Health Insurance.",
-    "ground_truth": "Star Health Assure: 36 months for 1-year and 2-year policies, 30 months for 3-year policies. Group Health Insurance specifies waiting periods for specific conditions (e.g. 24 months for kidney stones, tonsils) but does not state a blanket PED waiting period in the same way."
-  },
-  {
-    "question": "Which policy would be better for a family wanting to cover up to 9 members under one plan?",
-    "ground_truth": "Star Health Assure is the better choice as it explicitly allows up to 9 members of a family under a single family floater policy, covering adults from 18 to 75 years and dependent children from 16 days to 25 years."
-  },
-  {
-    "question": "How many days notice must a policyholder give to cancel a Star Health Assure policy?",
-    "ground_truth": "The policyholder may cancel the Star Health Assure policy any time during the term by giving 7 days written notice."
-  },
-  {
-    "question": "Are day care treatments covered under Star Health Assure?",
-    "ground_truth": "Yes, all day care treatments are covered under Star Health Assure Insurance Policy."
+    "question": "What is the maximum sum insured available under Star Health Assure?",
+    "ground_truth": "The maximum sum insured available under Star Health Assure is Rs. 2 Crore."
   },
   {
     "question": "What is the waiting period for pre-existing diseases under a 1-year Star Health Assure policy?",
     "ground_truth": "Under a 1-year or 2-year Star Health Assure policy, pre-existing diseases are excluded until the expiry of 36 months of continuous coverage after the date of inception of the first policy."
   },
   {
-    "question": "What is the waiting period for pre-existing diseases under a 3-year Star Health Assure policy?",
-    "ground_truth": "Under a 3-year Star Health Assure policy, pre-existing diseases are excluded until the expiry of 30 months of continuous coverage after the date of inception of the first policy."
+    "question": "Are day care treatments covered under Star Health Assure?",
+    "ground_truth": "Yes, all day care treatments are covered under Star Health Assure Insurance Policy."
   },
   {
-    "question": "What is the maximum sum insured available under Star Health Assure?",
-    "ground_truth": "The maximum sum insured available under Star Health Assure is Rs. 2 Crore."
+    "question": "How many days notice must a policyholder give to cancel a Star Health Assure policy?",
+    "ground_truth": "The policyholder may cancel the Star Health Assure policy any time during the term by giving 7 days written notice."
   },
+  {
+    "question": "What is the maximum age limit for adults under Star Health Assure and what is the minimum entry age for children?",
+    "ground_truth": "The maximum age for adults under Star Health Assure is 75 years with a minimum of 18 years. Dependent children can be covered from a minimum of 16 days up to 25 years of age."
+  },
+  {
+    "question": "Which policy would be better for a family wanting to cover up to 9 members under one plan?",
+    "ground_truth": "Star Health Assure is the better choice as it explicitly allows up to 9 members of a family under a single family floater policy, covering adults from 18 to 75 years and dependent children from 16 days to 25 years."
+  },
+
   {
     "question": "What is the minimum hospitalisation period required to claim Group Hospital Cash Benefit?",
     "ground_truth": "The insured person must be hospitalised for a minimum of 2 days with a continuous and completed period of at least 24 hours to claim the Group Hospital Cash Benefit."
@@ -56,27 +131,24 @@
     "ground_truth": "No, treatment for sexually transmitted diseases including Genital Warts, Syphilis, Gonorrhoea, Genital Herpes, Chlamydia, Pubic Lice and Trichomoniasis is excluded under Group Health Insurance."
   },
   {
-    "question": "Which policy is better for a young couple wanting maternity or fertility treatment coverage?",
-    "ground_truth": "Star Health Assure is the better option as it explicitly covers Assisted Reproduction Treatment after a 24-month waiting period and covers In Utero Fetal Surgery after 24 months. The Group Health Insurance policy document does not mention such benefits."
-  },
-  {
     "question": "What specific conditions have a 24-month waiting period under Group Health Insurance?",
     "ground_truth": "The following conditions have a 24-month specific waiting period under Group Health Insurance: stones in the urinary system, stones in the biliary system, surgery on tonsils or adenoids, uterine polyps, any type of breast lumps, treatment for spondylosis or spondylitis, and inter-vertebral disc prolapse (IVDP)."
-  },
-  {
-    "question": "How many times is the sum insured automatically restored under Star Health Assure and what is the restoration limit?",
-    "ground_truth": "Under Star Health Assure, the sum insured is restored an unlimited number of times, up to 100% each time. Restoration triggers immediately upon partial or full utilisation and can be used for a subsequent hospitalisation."
   },
   {
     "question": "Is treatment for refractive errors of the eye covered under Group Health Insurance?",
     "ground_truth": "Treatment for refractive errors of the eye is excluded under Group Health Insurance unless it results from an Accident or the correction required exceeds plus or minus 7.5 diopters."
   },
+
   {
-    "question": "What is the maximum age limit for adults under Star Health Assure and what is the minimum entry age for children?",
-    "ground_truth": "The maximum age for adults under Star Health Assure is 75 years with a minimum of 18 years. Dependent children can be covered from a minimum of 16 days up to 25 years of age."
+    "question": "Compare the pre-existing disease waiting period between SBI health insurance and Star Health Assure.",
+    "ground_truth": "SBI health insurance excludes pre-existing diseases for 48 consecutive months (4 years) from inception. Star Health Assure excludes them for 36 months under 1-year and 2-year policies, and 30 months under 3-year policies. Star Health Assure therefore has a shorter pre-existing disease waiting period."
   },
   {
-    "question": "Which policy covers non-medical consumable items during hospitalisation?",
-    "ground_truth": "Star Health Assure covers non-medical consumable items subject to an admissible claim under the policy. Details are available on the Star Health website."
+    "question": "Does SBI health insurance or Star Health Assure cover fertility treatment?",
+    "ground_truth": "Star Health Assure covers Assisted Reproduction Treatment after a 24-month waiting period. SBI health insurance explicitly excludes any fertility, sub-fertility or assisted conception operations, sterilisation procedures and related treatments."
+  },
+  {
+    "question": "Does SBI health insurance cover mental illness?",
+    "ground_truth": "No. SBI health insurance excludes treatment for any mental illness, psychiatric or psychological ailment or condition. Treatment at institutions primarily for psychiatric or mental disorders, even if registered as a hospital, is also excluded."
   }
 ]
