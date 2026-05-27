@@ -222,9 +222,12 @@ def generate_answer(query: str, session_id: str) -> ChatResult:
             candidates.append(kchunk)
             existing_texts.add(kchunk.text)
 
-    # Guardrail: if the best bi-encoder score is below threshold, nothing
-    # relevant exists. Skip reranker and LLM — saves cost and latency.
-    if not candidates or candidates[0].score < SIMILARITY_THRESHOLD:
+    # Guardrail: skip LLM if nothing relevant was found.
+    # Keyword hits (exact substring match) are definitive proof the topic
+    # exists in the docs, so bypass the score threshold when we have any.
+    # Without keyword hits, fall back if the best dense score is too low.
+    best_score = max((c.score for c in candidates), default=0.0)
+    if not candidates or (not kw_chunks and best_score < SIMILARITY_THRESHOLD):
         _history[session_id].append(("user", query))
         _history[session_id].append(("model", FALLBACK_ANSWER))
         return ChatResult(
