@@ -55,24 +55,54 @@ def _key_terms(text: str) -> list[str]:
     return terms[:8]
 
 
-_KB_META_PATTERNS = [
-    "which company", "which companies", "which insurer", "which insurers",
-    "which insurance", "which policies", "which policy", "which document",
-    "what company", "what companies", "what insurer", "what insurance",
-    "what policies", "what policy", "what documents", "what do you have",
-    "what are you trained", "what data do you", "available policies",
-    "available companies", "available documents", "available insurers",
-    "do you have", "you have data", "you have information",
-    "list of policies", "list of companies", "list of insurers",
-    "tell me about the policies", "tell me what policies",
-    "which plans", "what plans", "available plans",
+_KB_NOUNS = {
+    "company", "companies", "insurer", "insurers", "insurance",
+    "policy", "policies", "document", "documents", "plan", "plans",
+    "data", "information", "details",
+}
+_KB_INTENT_WORDS = {"which", "what", "list", "show", "tell", "available", "have"}
+_KB_YOU_HAVE_PHRASES = [
+    "you have", "do you have", "you got", "you contain",
+    "you cover", "you support", "you trained", "you know about",
 ]
 
 
 def _is_kb_meta_query(query: str) -> bool:
     """Return True if the user is asking about what's in the knowledge base."""
     q = query.lower().strip()
-    return any(pattern in q for pattern in _KB_META_PATTERNS)
+
+    # Explicit "you have / do you have" + a KB noun → always meta
+    if any(phrase in q for phrase in _KB_YOU_HAVE_PHRASES):
+        words = set(q.split())
+        if words & _KB_NOUNS:
+            return True
+
+    # "what/which are the companies/insurers/policies ..."
+    # Catches "what are the companies", "which are the policies", etc.
+    for noun in _KB_NOUNS:
+        if noun in q and any(f"are the {noun}" in q or f"is the {noun}" in q
+                             for _ in [None]):
+            return True
+
+    # Intent word + KB noun as individual tokens (conservative: require both)
+    words = set(q.split())
+    if words & _KB_INTENT_WORDS and words & {"company", "companies", "insurer",
+                                              "insurers", "insur"}:
+        return True
+
+    # Substring phrase fallbacks
+    fallback_phrases = [
+        "list of compan", "list of insur", "list of polic",
+        "available compan", "available insur", "available polic",
+        "what are the compan", "what are the insur", "what are the polic",
+        "which compan", "which insur", "which polic",
+        "what compan", "what insur", "what polic",
+        "what documents", "which documents",
+        "tell me what you have", "what do you have",
+        "what data do you", "what information do you",
+        "insurance data", "data for", "you have data",
+    ]
+    return any(phrase in q for phrase in fallback_phrases)
 
 
 _openai = OpenAI(api_key=OPENAI_API_KEY)
