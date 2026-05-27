@@ -56,53 +56,53 @@ def _key_terms(text: str) -> list[str]:
 
 
 _KB_NOUNS = {
-    "company", "companies", "insurer", "insurers", "insurance",
-    "policy", "policies", "document", "documents", "plan", "plans",
-    "data", "information", "details",
+    "company", "companies", "insurer", "insurers",
+    "document", "documents", "data", "information",
 }
-_KB_INTENT_WORDS = {"which", "what", "list", "show", "tell", "available", "have"}
+# Specific insurer names — if present, query is about content, not KB inventory
+_INSURER_NAMES = {
+    "sbi", "star", "brochure", "max", "bajaj", "hdfc", "icici", "aditya",
+    "niva", "care", "reliance", "tata", "manipal", "digit", "future",
+    "oriental", "national", "united", "new india",
+}
 _KB_YOU_HAVE_PHRASES = [
     "you have", "do you have", "you got", "you contain",
-    "you cover", "you support", "you trained", "you know about",
+    "you support", "you trained", "you know about",
 ]
 
 
 def _is_kb_meta_query(query: str) -> bool:
     """Return True if the user is asking about what's in the knowledge base."""
     q = query.lower().strip()
+    words = set(q.split())
 
-    # Explicit "you have / do you have" + a KB noun → always meta
+    # If query names a specific insurer → content question, never meta
+    if words & _INSURER_NAMES:
+        return False
+
+    # "you have / do you have" + a KB noun (company, insurer, document, data…)
     if any(phrase in q for phrase in _KB_YOU_HAVE_PHRASES):
-        words = set(q.split())
         if words & _KB_NOUNS:
             return True
 
-    # "what/which are the companies/insurers/policies ..."
-    # Catches "what are the companies", "which are the policies", etc.
-    for noun in _KB_NOUNS:
-        if noun in q and any(f"are the {noun}" in q or f"is the {noun}" in q
-                             for _ in [None]):
-            return True
-
-    # Intent word + KB noun as individual tokens (conservative: require both)
-    words = set(q.split())
-    if words & _KB_INTENT_WORDS and words & {"company", "companies", "insurer",
-                                              "insurers", "insur"}:
+    # Intent word + company/insurer token (no specific name present, checked above)
+    if words & {"which", "what", "list", "show"} and words & {
+        "company", "companies", "insurer", "insurers"
+    }:
         return True
 
-    # Substring phrase fallbacks
-    fallback_phrases = [
-        "list of compan", "list of insur", "list of polic",
-        "available compan", "available insur", "available polic",
-        "what are the compan", "what are the insur", "what are the polic",
-        "which compan", "which insur", "which polic",
-        "what compan", "what insur", "what polic",
+    # Explicit inventory phrases
+    inventory_phrases = [
+        "list of compan", "list of insur",
+        "available compan", "available insur",
+        "what are the compan", "what are the insur",
+        "which compan", "which insur",
+        "what compan", "what insur",
         "what documents", "which documents",
         "tell me what you have", "what do you have",
         "what data do you", "what information do you",
-        "insurance data", "data for", "you have data",
     ]
-    return any(phrase in q for phrase in fallback_phrases)
+    return any(phrase in q for phrase in inventory_phrases)
 
 
 _openai = OpenAI(api_key=OPENAI_API_KEY)
